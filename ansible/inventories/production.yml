@@ -1,0 +1,35 @@
+all:
+  hosts:
+    web1:
+      ansible_host: 3.229.85.92
+      ansible_user: deploy
+      ansible_python_interpreter: /usr/bin/python3
+ansible/playbooks/deploy.yml:
+
+---
+- name: Deploy Node app
+  hosts: all
+  become: no
+  vars:
+    git_ref: "{{ lookup('env','GIT_REF') | default('main') }}"
+  roles:
+    - node_app
+ansible/roles/node_app/tasks/main.yml:
+
+---
+- name: Ensure git is present
+  apt:
+    name: git
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: Ensure nodejs is present
+  apt:
+    name: nodejs
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: Include deploy tasks
+  import_tasks: deploy.yml

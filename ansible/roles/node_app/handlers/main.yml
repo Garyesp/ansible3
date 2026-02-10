@@ -1,0 +1,26 @@
+---
+- name: Reload systemd
+  command: systemctl daemon-reload
+  become: yes
+
+- name: Restart myapp
+  systemd:
+    name: myapp
+    state: restarted
+  become: yes
+ansible/roles/node_app/templates/node-app.service.j2:
+
+[Unit]
+Description=My Node.js App (Ansible)
+After=network.target
+
+[Service]
+User=deploy
+WorkingDirectory=/home/deploy/apps/myapp/app
+ExecStart=/usr/bin/node /home/deploy/apps/myapp/app/index.js
+Restart=always
+Environment=NODE_ENV=production
+Environment=PORT=3000
+
+[Install]
+WantedBy=multi-user.target
